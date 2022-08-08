@@ -1,0 +1,20 @@
+[package]
+name = "markup-converter"
+description = "A utility to convert between YAML, TOML, and JSON"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+author = [
+  "jsoverson@gmail.com",
+  "shazaibn93@gmail.com"
+]
+
+[dependencies]
+serde_yaml = "0.9"
+serde_json = "1.0"
+toml = "0.5"
+thiserror = "1.0"
+
+[dev-dependencies]
+anyhow = "1.0"
+jaq-core = "0.7"
