@@ -1,12 +1,14 @@
 [package]
 name = "markup-converter"
-description = "A utility to convert between YAML, TOML, and JSON"
+description = "A utility to convert YAML, TOML, and JSON files"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
-author = [
-  "jsoverson@gmail.com",
-  "shazaibn93@gmail.com"
+readme = "../README.md"
+keywords = ["json", "toml", "yaml"]
+authors = [
+  "Jarrod Overson <jsoverson@gmail.com>",
+  "Shazaib Nasrullah <shazaibn93@gmail.com>"
 ]
 
 [dependencies]
