@@ -3,10 +3,35 @@ use crate::error::Error;
 type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Clone, PartialEq)]
-enum Format {
+/// An enum with variants that contain the deserialized representations of supported formats.
+pub enum Format {
+    /// JSON Format
     Json(serde_json::Value),
+    /// TOML Format
     Toml(toml::Value),
+    /// YAML format
     Yaml(serde_yaml::Value),
+}
+
+impl Format {
+    /// Parse a string as YAML and return a Format::Yaml
+    pub fn yaml(src: &str) -> Result<Format> {
+        serde_yaml::from_str(src)
+            .map(Format::Yaml)
+            .map_err(|e| Error::BadYaml(e.to_string()))
+    }
+    /// Parse a string as TOML and return a Format::Toml
+    pub fn toml(src: &str) -> Result<Format> {
+        toml::from_str(src)
+            .map(Format::Toml)
+            .map_err(|e| Error::BadToml(e.to_string()))
+    }
+    /// Parse a string as JSON and return a Format::Json
+    pub fn json(src: &str) -> Result<Format> {
+        serde_json::from_str(src)
+            .map(Format::Json)
+            .map_err(|e| Error::BadJson(e.to_string()))
+    }
 }
 
 #[derive(Debug)]
@@ -25,26 +50,11 @@ fn parse(path: impl AsRef<std::path::Path>) -> Result<Format> {
         .map_err(|e| Error::FileRead(path.to_string_lossy().to_string(), e.to_string()))?;
 
     let value = if ext.eq_ignore_ascii_case("toml") {
-        match toml::from_str(&markup) {
-            Ok(toml_value) => Format::Toml(toml_value),
-            Err(e) => {
-                return Err(Error::BadToml(e.to_string()));
-            }
-        }
+        Format::toml(&markup)?
     } else if ext.eq_ignore_ascii_case("yaml") || ext.eq_ignore_ascii_case("yml") {
-        match serde_yaml::from_str(&markup) {
-            Ok(val) => Format::Yaml(val),
-            Err(e) => {
-                return Err(Error::BadYaml(e.to_string()));
-            }
-        }
+        Format::yaml(&markup)?
     } else if ext.eq_ignore_ascii_case("json") {
-        match serde_json::from_str(&markup) {
-            Ok(val) => Format::Json(val),
-            Err(e) => {
-                return Err(Error::BadJson(e.to_string()));
-            }
-        }
+        Format::json(&markup)?
     } else {
         return Err(Error::UnknownFileExtension(
             path.to_string_lossy().to_string(),
@@ -55,8 +65,13 @@ fn parse(path: impl AsRef<std::path::Path>) -> Result<Format> {
 }
 
 impl Transcoder {
-    /// Constructor for [Transcoder], takes a file path.
-    pub fn new(path: impl AsRef<std::path::Path>) -> Result<Self> {
+    /// Constructor for [Transcoder] that takes a [Format]
+    pub fn new(input: Format) -> Result<Self> {
+        Ok(Self { input })
+    }
+
+    /// Constructor for [Transcoder] that reads a file path and infers the type from the extension.
+    pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<Self> {
         let input = parse(path)?;
 
         Ok(Self { input })

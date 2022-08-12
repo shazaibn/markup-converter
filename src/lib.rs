@@ -77,4 +77,4 @@
 mod error;
 mod transcoder;
 
-pub use transcoder::Transcoder;
+pub use transcoder::{Format, Transcoder};

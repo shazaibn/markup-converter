@@ -10,7 +10,7 @@ Instantiate a new Transcoder instance with a JSON, YAML, or TOML path and use `.
 use markup_converter::Transcoder;
 
 fn main() -> anyhow::Result<()> {
-  let transcoder = Transcoder::new("tests/test.yaml")?;
+  let transcoder = Transcoder::from_path("tests/test.yaml")?;
 
   let json_val = transcoder.to_json()?;
 
@@ -19,5 +19,3 @@ fn main() -> anyhow::Result<()> {
   Ok(())
 }
 ```
-
-
